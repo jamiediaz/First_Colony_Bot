@@ -1,4 +1,5 @@
 from splinter import Browser
+
 # from bs4 import BeautifulSoup
 
 
@@ -246,8 +247,59 @@ if browser.is_element_present_by_text('8:00pm') == False:
         book_it.find_by_value('Book it').click()
         browser.find_by_name('finalize_appt').click()
     
-else: 
-    print("no time available")
+if browser.is_element_present_by_name('next'):
+        browser.find_by_name('next').click()
+else: print("no time available")
+
+if browser.is_element_present_by_text('7:00pm'):
+    book_it = browser.find_by_xpath("//td[. = '7:00pm']/following-sibling::td")
+    book_it.find_by_value('Book it').click()
+    browser.find_by_name('finalize_appt').click()
+
+if browser.is_element_present_by_text('7:00pm') == False:
+    browser.find_by_name('e_id').click()
+    browser.find_by_value('5311').click()
+    if browser.is_element_present_by_text('7:00pm'):
+        book_it = browser.find_by_xpath("//td[. = '7:00pm']/following-sibling::td")
+        book_it.find_by_value('Book it').click()
+        browser.find_by_name('finalize_appt').click()
+    else:
+        browser.find_by_name('e_id').click()
+        browser.find_by_value('4807').click() 
+
+if browser.is_element_present_by_text('7:30pm'):
+    book_it = browser.find_by_xpath("//td[. = '7:30pm']/following-sibling::td")
+    book_it.find_by_value('Book it').click()
+    browser.find_by_name('finalize_appt').click()
+
+if browser.is_element_present_by_text('7:30pm') == False:
+    browser.find_by_name('e_id').click()
+    browser.find_by_value('5311').click()
+    if browser.is_element_present_by_text('7:30pm'):
+        book_it = browser.find_by_xpath("//td[. = '7:30pm']/following-sibling::td")
+        book_it.find_by_value('Book it').click()
+        browser.find_by_name('finalize_appt').click()
+    else:
+        browser.find_by_name('e_id').click()
+        browser.find_by_value('4807').click() 
+
+if browser.is_element_present_by_text('8:00pm'):
+    book_it = browser.find_by_xpath("//td[. = '8:00pm']/following-sibling::td")
+    book_it.find_by_value('Book it').click()
+    browser.find_by_name('finalize_appt').click()
+
+if browser.is_element_present_by_text('8:00pm') == False:
+    browser.find_by_name('e_id').click()
+    browser.find_by_value('5311').click()
+    if browser.is_element_present_by_text('8:00pm'):
+        book_it = browser.find_by_xpath("//td[. = '8:00pm']/following-sibling::td")
+        book_it.find_by_value('Book it').click()
+        browser.find_by_name('finalize_appt').click()
+    
+if browser.is_element_present_by_name('next'):
+        browser.find_by_name('next').click()
+else: print("no time available")
+
 
 browser.quit
 
