@@ -8,7 +8,7 @@ import sys
 
 url='https://booknow.appointment-plus.com/b6l56ers/'
 executable_path = {'executable_path':'chromedriver.exe'}
-browser = Browser('chrome', **executable_path, headless=False)
+browser = Browser('chrome',**executable_path, headless=False)
 
 browser.visit(url)
 
@@ -204,51 +204,57 @@ courtsdf.sort_values(by='time_obj', inplace=True)
 # Select only the rows containing the word, Sunday or Thursday from the dataframe
 # and save it to filtered_dates.
 
-filtered_dates = courtsdf[courtsdf['Date'].str.contains('Thursday|Sunday', case=False, regex=True)]
+filtered_dates = courtsdf[courtsdf['Date'].str.contains('Sunday', case=False, regex=True)]
 filtered_dates = filtered_dates.reset_index(drop=True)
 filtered_dates = filtered_dates.drop('Date', axis=1)
 print(filtered_dates)
 browser.quit
 
-if filtered_dates['Time'].str.contains('5:00pm|5:30pm', case=False, regex=True).any():
+if filtered_dates['Time'].str.contains('4:00pm|4:30pm|5:00pm|5:30pm|6:00pm|6:30pm|7:00pm|7:30pm|8:00pm', case=False, regex=True).any():
 
-    SMSdf = filtered_dates[filtered_dates['Time'].str.contains('5:00pm|5:30pm', case=False, regex=True)]
-    SMSdf = SMSdf.reset_index(drop=True).drop('time_obj',axis=1).drop('Court ID', axis=1)
-    message_body = ''
-    for x in SMSdf.index:
-        message_body += '\n' + SMSdf['Court Name'][x] + ': ' + SMSdf['Time'][x] +'\n'
-    print(message_body)   
+        SMSdf = filtered_dates[filtered_dates['Time'].str.contains('4:00pm|4:30pm|5:00pm|5:30pm|6:00pm|6:30pm|7:00pm|7:30pm|8:00pm', case=False, regex=True)]
+        SMSdf = SMSdf.reset_index(drop=True).drop('time_obj',axis=1).drop('Court ID', axis=1)
+        message_body = ':\n'
+        for x in SMSdf.index:
+                message_body += '\n' + SMSdf['Court Name'][x] + ': ' + SMSdf['Time'][x] +'\n'
+        print(message_body)   
 
-email = "picklebot@zohomail.com"
-pas = "cupN00dles"
+        email = "picklebot@zohomail.com"
+        pas = "cupN00dles"
 
-sms_gateway = '8327154545@txt.att.net'
-# The server we use to send emails in our case it will be gmail but every email provider has a different smtp 
-# and port is also provided by the email provider.
-smtp = "smtp.zoho.com" 
-port = 587
-# This will start our email server
-server = smtplib.SMTP(smtp,port)
-# Starting the server
-server.ehlo()
-server.starttls()
-# Now we need to login
-server.login(email,pas)
+        contact_List = ['8327154545@txt.att.net','2817321638@vtext.com','7133981968@tmomail.net']
+        
+        for telnum in contact_List:
 
-# Now we use the MIME module to structure our message.
-msg = MIMEMultipart()
-msg['From'] = email
-msg['To'] = sms_gateway
-# Make sure you add a new line in the subject
-msg['Subject'] = "Available Time Slots\n"
-# Make sure you also add new lines to your body
-body = message_body
-# and then attach that body furthermore you can also send html content.
-msg.attach(MIMEText(body, 'plain'))
+                sms_gateway = telnum
+                # The server we use to send emails in our case it will be gmail but every email provider has a different smtp 
+                # and port is also provided by the email provider.
+                smtp = "smtp.zoho.com" 
+                port = 587
+                # This will start our email server
+                server = smtplib.SMTP(smtp,port)
+                # Starting the server
+                server.ehlo()
+                server.starttls()
+                # Now we need to login
+                server.login(email,pas)
 
-sms = msg.as_string()
+                # Now we use the MIME module to structure our message.
+                msg = MIMEMultipart()
+                msg['From'] = email
+                msg['To'] = sms_gateway
+                # Make sure you add a new line in the subject
+                msg['Subject'] = "Available Time Slots\n"
+                # Make sure you also add new lines to your body
+                body = message_body
+                # and then attach that body furthermore you can also send html content.
+                msg.attach(MIMEText(body, 'plain'))
 
-server.sendmail(email,sms_gateway,sms)
+                sms = msg.as_string()
 
-# lastly quit the server
-server.quit()
+                server.sendmail(email,sms_gateway,sms)
+
+
+
+        # lastly quit the server
+        server.quit()

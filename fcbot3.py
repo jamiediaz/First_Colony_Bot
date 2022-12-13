@@ -1,7 +1,10 @@
 import pandas as pd
 from splinter import Browser
 from bs4 import BeautifulSoup as bs
-import sys
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 
 url='https://booknow.appointment-plus.com/b6l56ers/'
 executable_path = {'executable_path':'chromedriver.exe'}
@@ -161,11 +164,75 @@ courtsdf = courtsdf.reset_index(drop=True)
 courtsdf['time_obj'] = pd.to_datetime(courtsdf['Time'])
 courtsdf['time_obj'] = pd.to_datetime(courtsdf['time_obj'],format='%H:%M').dt.time
 courtsdf.sort_values(by='time_obj', inplace=True)
-
+print(courtsdf)
 # Select only the rows containing the word, Sunday or Thursday from the dataframe
 # and save it to filtered_dates.
 
 filtered_dates = courtsdf[courtsdf['Date'].str.contains('Thursday|Sunday', case=False, regex=True)]
+# filtered_dates = filtered_dates.reset_index(drop=True)
+# filtered_dates = filtered_dates.drop('Date', axis=1)
+filtered_dates["time_obj"] = filtered_dates['time_obj'].astype(str)
+filtered_dates['time_obj'] = filtered_dates['time_obj'].replace(':','', regex=True)
+filtered_dates["time_obj"] = filtered_dates['time_obj'].astype(int)
+
+# clear times that are earlier than below. 163000 = 4:30:00 PM
+filtered_dates = filtered_dates[filtered_dates['time_obj'] > 163000]
 filtered_dates = filtered_dates.reset_index(drop=True)
-filtered_dates = filtered_dates.drop('Date', axis=1)
 print(filtered_dates)
+if filtered_dates.empty:
+        print("No Times Available.")
+else:
+        court_id = filtered_dates.iloc[0]['Court ID']
+        session_time = filtered_dates.iloc[0]['Time']
+
+        browser.find_by_name('e_id').click()
+        browser.find_by_value(court_id).click()
+
+        book_it = browser.find_by_xpath("//td[. = '" + session_time + "']/following-sibling::td")
+        book_it.find_by_value('Book it').click()
+        browser.find_by_name('finalize_appt').click()
+
+
+
+        email = "picklebot@zohomail.com"
+        pas = "cupN00dles"
+
+        contact_List = ['8327154545@txt.att.net','2817321638@vtext.com','7133981968@tmomail.net']
+        
+        for telnum in contact_List:
+
+                sms_gateway = telnum
+                # The server we use to send emails in our case it will be gmail but every email provider has a different smtp 
+                # and port is also provided by the email provider.
+                smtp = "smtp.zoho.com" 
+                port = 587
+                # This will start our email server
+                server = smtplib.SMTP(smtp,port)
+                # Starting the server
+                server.ehlo()
+                server.starttls()
+                # Now we need to login
+                server.login(email,pas)
+
+                # Now we use the MIME module to structure our message.
+                msg = MIMEMultipart()
+                msg['From'] = email
+                msg['To'] = sms_gateway
+                # Make sure you add a new line in the subject
+                msg['Subject'] = "The following time was booked\n"
+                # Make sure you also add new lines to your body
+                body = '\n' + filtered_dates.iloc[0]['Court Name'] + ': ' + filtered_dates.iloc[0]['Date'] +' - ' + filtered_dates.iloc[0]['Time']
+                # and then attach that body furthermore you can also send html content.
+                msg.attach(MIMEText(body, 'plain'))
+
+                sms = msg.as_string()
+
+                server.sendmail(email,sms_gateway,sms)
+
+
+
+        # lastly quit the server
+        server.quit()
+
+
+browser.quit

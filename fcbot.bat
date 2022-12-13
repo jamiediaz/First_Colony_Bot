@@ -1,2 +1,1 @@
-@echo off
-"C:\Users\jamie\AppData\Local\Programs\Python\Python311\python.exe" "fcbot2.py"
+start C:\Python\Python311\python.exe E:\Users\jamie\Documents\projects\First_Colony_Bot\fcbot2.py
