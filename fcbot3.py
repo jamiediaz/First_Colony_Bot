@@ -175,13 +175,32 @@ filtered_dates["time_obj"] = filtered_dates['time_obj'].astype(str)
 filtered_dates['time_obj'] = filtered_dates['time_obj'].replace(':','', regex=True)
 filtered_dates["time_obj"] = filtered_dates['time_obj'].astype(int)
 
-# clear times that are earlier than below. 163000 = 4:30:00 PM
-filtered_dates = filtered_dates[filtered_dates['time_obj'] > 163000]
-filtered_dates = filtered_dates.reset_index(drop=True)
-print(filtered_dates)
+# if filtered_dates['Date'].str.contains('Sunday').any() == True:
+#         # clear times that are earlier than below. 170000 = 5:00:00 PM
+#         filtered_dates = filtered_dates[filtered_dates['time_obj'] >= 170000]
+#         filtered_dates = filtered_dates.reset_index(drop=True)
+#         print(filtered_dates)
+
+# else:
+#         filtered_dates = filtered_dates[filtered_dates['time_obj'] >= 190000]
+#         filtered_dates = filtered_dates.reset_index(drop=True)
+#         print(filtered_dates)
+
 if filtered_dates.empty:
         print("No Times Available.")
 else:
+        if filtered_dates['Date'].str.contains('Sunday').any() == True:
+                # clear times that are earlier than below. 170000 = 5:00:00 PM
+                filtered_dates = filtered_dates[filtered_dates['time_obj'] >= 170000]
+                filtered_dates = filtered_dates.reset_index(drop=True)
+                print(filtered_dates)
+
+        else:
+                # for all the other days. book at 7PM
+                filtered_dates = filtered_dates[filtered_dates['time_obj'] >= 190000]
+                filtered_dates = filtered_dates.reset_index(drop=True)
+                print(filtered_dates)
+                
         court_id = filtered_dates.iloc[0]['Court ID']
         session_time = filtered_dates.iloc[0]['Time']
 
