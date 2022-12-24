@@ -60,6 +60,7 @@ for TDs in date_scheduled:
     for idiv in innerDivs:
             date_list.append(idiv.get_text(strip=True))
 
+
 # if the next button is available, 
 # click it and grab all the text that is in between <td>,/td> 
 # and add it to the date_list list. 
@@ -205,28 +206,38 @@ courtsdf.sort_values(by='time_obj', inplace=True)
 # and save it to filtered_dates.
 
 filtered_dates = courtsdf[courtsdf['Date'].str.contains('Sunday', case=False, regex=True)]
+filtered_dates["time_obj"] = filtered_dates['time_obj'].astype(str)
+filtered_dates['time_obj'] = filtered_dates['time_obj'].replace(':','', regex=True)
+filtered_dates["time_obj"] = filtered_dates['time_obj'].astype(int)
+filtered_dates = filtered_dates[filtered_dates['time_obj'] >= 160000]
 filtered_dates = filtered_dates.reset_index(drop=True)
-filtered_dates = filtered_dates.drop('Date', axis=1)
-print(filtered_dates)
+# filtered_dates = filtered_dates.drop('Date', axis=1)
+# print(filtered_dates)
 browser.quit
 
-if filtered_dates['Time'].str.contains('4:00pm|4:30pm|5:00pm|5:30pm|6:00pm|6:30pm|7:00pm|7:30pm|8:00pm', case=False, regex=True).any():
+if filtered_dates.empty:
+        print("No Times Available.")
 
-        SMSdf = filtered_dates[filtered_dates['Time'].str.contains('4:00pm|4:30pm|5:00pm|5:30pm|6:00pm|6:30pm|7:00pm|7:30pm|8:00pm', case=False, regex=True)]
-        SMSdf = SMSdf.reset_index(drop=True).drop('time_obj',axis=1).drop('Court ID', axis=1)
+else: 
+
+
+# if filtered_dates['Time'].str.contains('4:00pm|4:30pm|5:00pm|5:30pm|6:00pm|6:30pm|7:00pm|7:30pm|8:00pm', case=False, regex=True).any():
+
+#         SMSdf = filtered_dates[filtered_dates['Time'].str.contains('4:00pm|4:30pm|5:00pm|5:30pm|6:00pm|6:30pm|7:00pm|7:30pm|8:00pm', case=False, regex=True)]
+#         SMSdf = SMSdf.reset_index(drop=True).drop('time_obj',axis=1).drop('Court ID', axis=1)
         message_body = ':\n'
-        for x in SMSdf.index:
-                message_body += '\n' + SMSdf['Court Name'][x] + ': ' + SMSdf['Time'][x] +'\n'
-        print(message_body)   
+        for x in filtered_dates.index:
+                message_body += '\n' + filtered_dates['Court Name'][x] + ': ' + filtered_dates['Time'][x] +'\n'
+        # print(message_body)   
 
         email = "picklebot@zohomail.com"
         pas = "cupN00dles"
 
         contact_List = ['8327154545@txt.att.net','2817321638@vtext.com','7133981968@tmomail.net']
         
-        for telnum in contact_List:
+        for telnumX in contact_List:
 
-                sms_gateway = telnum
+                sms_gateway = telnumX
                 # The server we use to send emails in our case it will be gmail but every email provider has a different smtp 
                 # and port is also provided by the email provider.
                 smtp = "smtp.zoho.com" 
@@ -256,5 +267,5 @@ if filtered_dates['Time'].str.contains('4:00pm|4:30pm|5:00pm|5:30pm|6:00pm|6:30p
 
 
 
-        # lastly quit the server
-        server.quit()
+#         # lastly quit the server
+#         server.quit()
